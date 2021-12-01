@@ -61,7 +61,6 @@ const loginValidation = celebrate({
   }),
 });
 
-
 module.exports = {
   userValidation,
   movieValidation,
