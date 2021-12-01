@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const { errors } = require('celebrate');
+const bodyParser = require('body-parser');
 const errorsHandler = require('./middlewares/error');
 const router = require('./routes/index');
 const limiter = require('./middlewares/limiter');
@@ -34,6 +35,8 @@ mongoose.connect(dbMovies, {
 
 app.use(requestLogger);
 app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('*', cors(options));
 
 app.use(helmet());
