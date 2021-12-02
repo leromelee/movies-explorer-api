@@ -9,6 +9,7 @@
     "linebreak-style": "off",
     "consistent-return": "off",
     "no-unresolved": "off",
+    "func-names": "off",
     "no-underscore-dangle": [
       "error",
       {
