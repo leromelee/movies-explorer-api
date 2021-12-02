@@ -1,7 +1,6 @@
 const { celebrate, Joi, CelebrateError } = require('celebrate');
-const { isURL, isEmail } = require('validator');
+const { isURL } = require('validator');
 const messages = require('../errors/errorsMessages');
-const BadRequestError = require('../errors/bad-request');
 
 const userValidation = celebrate({
   body: Joi.object().keys({
