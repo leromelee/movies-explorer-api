@@ -33,7 +33,7 @@ const movieSchema = mongoose.Schema({
     require: true,
     validate: {
       validator(v) {
-        return validator.isUrl(v);
+        return validator.isURL(v);
       },
       message: messages.url,
     },
@@ -44,7 +44,7 @@ const movieSchema = mongoose.Schema({
     require: true,
     validate: {
       validator(v) {
-        return validator.isUrl(v);
+        return validator.isURL(v);
       },
       message: messages.url,
     },
@@ -55,7 +55,7 @@ const movieSchema = mongoose.Schema({
     require: true,
     validate: {
       validator(v) {
-        return validator.isUrl(v);
+        return validator.isURL(v);
       },
       message: messages.url,
     },
