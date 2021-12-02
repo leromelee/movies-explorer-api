@@ -40,33 +40,29 @@ const updateUser = (req, res, next) => {
 
 const createUser = (req, res, next) => {
   const {
-    name, password, email,
+    name, email, password,
   } = req.body;
-  Users.findOne({ email }).then((user) => {
-    if (user) {
-      throw new ConflictRequestError(messages.conflictingError);
-    } else {
-      return bcrypt.hash(password, 10);
-    }
-  })
-    .then((hash) => User.create({
-      name,
-      email,
-      password: hash,
-    }))
+  Users.findOne({ email })
     .then((user) => {
-      res.send({
-        name: user.name,
-        email: user.email,
-      });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError(messages.badRequestError);
+      if (user) {
+        throw new ConflictRequestError(messages.conflictingError);
       } else {
-        next(err);
+        return bcrypt.hash(password, 12);
       }
     })
+    .then((hash) => Users.create({
+      name, email, password: hash,
+    })
+      .then((user) => res.status(200).send({
+        name: user.name, email: user.email,
+      }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          throw new BadRequestError(messages.badRequestError);
+        } else {
+          next(err);
+        }
+      }))
     .catch(next);
 };
 

@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { login, createUser } = require('../controllers/users');
+const { login, createUser, signOut } = require('../controllers/users');
 const { createUserValidation, loginValidation } = require('../middlewares/validation');
 const messages = require('../errors/errorsMessages');
 
@@ -20,6 +20,7 @@ router.get('/crash-test', () => {
 });
 
 router.use(auth);
+router.post('/signout', signOut);
 router.use(userRouter);
 router.use(movieRouter);
 

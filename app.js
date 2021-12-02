@@ -33,10 +33,11 @@ mongoose.connect(dbMovies, {
   useNewUrlParser: true,
 });
 
-app.use(requestLogger);
-app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(requestLogger);
+app.use(cookieParser());
 app.use('*', cors(options));
 
 app.use(helmet());
