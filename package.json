@@ -1,0 +1,50 @@
+{
+  "name": "diploma.api",
+  "version": "1.0.0",
+  "description": "## Директории",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "lint": "npx eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leromelee/movies-explorer-api.git"
+  },
+  "author": "Mikhail Sedenkov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leromelee/movies-explorer-api.git/issues"
+  },
+  "homepage": "https://github.com/leromelee/movies-explorer-api.git#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "celebrate": "^15.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "demon": "^1.4.4",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.5.1",
+    "express-winston": "^4.2.0",
+    "helmet": "^4.6.0",
+    "http-errors": "^1.8.0",
+    "joi": "^17.4.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12",
+    "validator": "^13.7.0",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.26.1",
+    "nodemon": "^2.0.14"
+  }
+}
