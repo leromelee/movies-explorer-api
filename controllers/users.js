@@ -6,6 +6,9 @@ const NotFoundError = require('../errors/not-found');
 const BadRequestError = require('../errors/bad-request');
 const UnauthorizedError = require('../errors/unauthorized');
 const ConflictRequestError = require('../errors/conflicting-reques');
+const {
+  SUCCESS_OK,
+} = require('../errors/statusOk');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -72,15 +75,27 @@ const signOut = (req, res) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return Users.findUserByCredentials(email, password).then((user) => {
-    const token = jwt.sign({ _id: user._id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret', { expiresIn: '7d' });
-    return res.cookie('jwt', token, {
-      maxAge: 3600000 * 24 * 7,
-      httpOnly: true,
-      sameSite: true,
-    }).send(messages.cookiesAdd);
-  })
+
+  Users.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error(messages.unauthorizeError));
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error(messages.unauthorizeError));
+          }
+
+          const token = jwt.sign(
+            { _id: user._id },
+            NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+            { expiresIn: '7d' },
+          );
+
+          res.status(SUCCESS_OK).send({ token });
+        });
+    })
     .catch(() => {
       throw new UnauthorizedError(messages.unauthorizeError);
     })

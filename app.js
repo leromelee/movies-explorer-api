@@ -18,6 +18,7 @@ const app = express();
 const options = {
   origin: [
     'http://localhost:3000',
+    'http://localhost:3001',
     'http://api.diplomaleromelee.nomoredomains.rocks',
     'https://api.diplomaleromelee.nomoredomains.rocks',
   ],
@@ -43,7 +44,7 @@ app.use('*', cors(options));
 app.use(helmet());
 app.use(limiter);
 app.use(router);
-app.use(express.json());
+app.use('/', express.json());
 
 app.use(errorLogger);
 app.use(errors());
