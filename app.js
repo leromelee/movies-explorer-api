@@ -21,6 +21,8 @@ const options = {
     'http://localhost:3001',
     'http://api.diplomaleromelee.nomoredomains.rocks',
     'https://api.diplomaleromelee.nomoredomains.rocks',
+    'http://diplomaleromelee.nomoredomains.rocks',
+    'https://diplomaleromelee.nomoredomains.rocks',
   ],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   preflightContinue: false,
