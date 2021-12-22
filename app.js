@@ -15,22 +15,6 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
-const options = {
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://api.diplomaleromelee.nomoredomains.rocks',
-    'https://api.diplomaleromelee.nomoredomains.rocks',
-    'http://diplomaleromelee.nomoredomains.rocks',
-    'https://diplomaleromelee.nomoredomains.rocks',
-  ],
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-};
-
 mongoose.connect(dbMovies, {
   useUnifiedTopology: true,
   useNewUrlParser: true,
@@ -41,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 app.use(cookieParser());
-app.use('*', cors(options));
+app.use(cors());
 
 app.use(helmet());
 app.use(limiter);
