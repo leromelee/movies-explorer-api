@@ -1,7 +1,7 @@
 {
-  "name": "diploma.api",
+  "name": "Дипломный проект",
   "version": "1.0.0",
-  "description": "## Директории",
+  "description": "Директории",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

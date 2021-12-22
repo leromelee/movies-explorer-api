@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema({
       message: messages.email,
     },
   },
-
   password: {
     type: String,
     select: false,

@@ -10,30 +10,38 @@ const ConflictRequestError = require('../errors/conflicting-reques');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const getUser = (req, res, next) => {
-  Users.findById(req.user._id).then((user) => {
-    if (!user) {
-      throw new NotFoundError(messages.notFoundError);
-    }
-    res.status(200).send(user);
-  })
+  Users.findById(req.user._id)
+    .orFail(new Error(messages.notFoundError))
+    .then((user) => res.send(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        throw new BadRequestError(messages.badRequestError);
+      } else if (err.message === 'NotFound') {
+        throw new NotFoundError(messages.notFoundError);
+      }
+    })
     .catch(next);
 };
 
 const updateUser = (req, res, next) => {
-  const userId = req.user._id;
   const { name, email } = req.body;
-  Users.findByIdAndUpdate(userId, { name, email }, { new: true, runValidators: true })
+
+  Users.findByIdAndUpdate(req.user._id, { name, email }, { runValidators: true, new: true })
     .then((user) => {
-      res.status(200).send(user);
+      if (!user) {
+        throw new NotFoundError(messages.notFoundError);
+      } else {
+        res.send(user);
+      }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError(messages.badRequestError);
-      }
-      if (err.code === 11000) {
+      } else if (err.name === 'CastError') {
+        throw new BadRequestError(messages.badRequestError);
+      } else if (err.name === 'MongoError' && err.code === 11000) {
         throw new ConflictRequestError(messages.conflictingError);
       }
-      next(err);
     })
     .catch(next);
 };
@@ -42,27 +50,24 @@ const createUser = (req, res, next) => {
   const {
     name, email, password,
   } = req.body;
-  Users.findOne({ email })
-    .then((user) => {
-      if (user) {
+
+  bcrypt.hash(password, 10)
+    .then((hash) => Users.create({
+      name,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.send({
+      name: user.name,
+      email: user.email,
+    }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequestError(messages.badRequestError);
+      } else if (err.name === 'MongoError' && err.code === 11000) {
         throw new ConflictRequestError(messages.conflictingError);
-      } else {
-        return bcrypt.hash(password, 12);
       }
     })
-    .then((hash) => Users.create({
-      name, email, password: hash,
-    })
-      .then((user) => res.status(200).send({
-        name: user.name, email: user.email,
-      }))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          throw new BadRequestError(messages.badRequestError);
-        } else {
-          next(err);
-        }
-      }))
     .catch(next);
 };
 
@@ -72,16 +77,29 @@ const signOut = (req, res) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  return Users.findUserByCredentials(email, password).then((user) => {
-    const token = jwt.sign({ _id: user._id },
-      NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret', { expiresIn: '7d' });
-    return res.cookie('jwt', token, {
-      maxAge: 3600000 * 24 * 7,
-      httpOnly: true,
-      sameSite: true,
-    }).send(messages.cookiesAdd);
-  })
-    .catch(() => {
+
+  Users.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error(messages.unauthorizeError));
+      }
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          return Promise.reject(new Error(messages.unauthorizeError));
+        }
+        return user;
+      });
+    })
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'super-strong-secret',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
+    // eslint-disable-next-line no-unused-vars
+    .catch((err) => {
       throw new UnauthorizedError(messages.unauthorizeError);
     })
     .catch(next);
