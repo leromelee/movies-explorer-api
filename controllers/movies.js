@@ -46,18 +46,29 @@ const addMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  const id = req.user._id;
-  Movies.findById(req.params._id).then((movie) => {
-    if (!movie) {
-      throw new NotFoundError(messages.notFoundError);
-    }
-    if (movie.owner.toString() !== id) {
-      throw new ForbiddenError(messages.forbiddenError);
-    } else {
-      return movie.remove().then(() => res.status(200).send(movie));
-    }
-  })
-    .catch(next);
+  const owner = req.user._id;
+  const { movieId } = req.params;
+
+  Movies.findById(movieId)
+    .orFail(new NotFoundError(messages.notFoundError))
+    .then((movie) => {
+      if (JSON.stringify(movie.owner) !== JSON.stringify(owner)) {
+        throw new ForbiddenError(messages.forbiddenError);
+      } else {
+        Movies.deleteOne({ _id: movieId })
+          .then(() => res.send({ movie }))
+          .catch(next);
+      }
+    })
+    .catch((err) => {
+      if (err.statusCode === 404) {
+        next(err);
+      } else if (err.statusCode === 403) {
+        next(err);
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
